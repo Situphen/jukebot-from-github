@@ -8,7 +8,20 @@
   <script src="./config.js"></script>
 </head>
 <body>
+  <style>
+  table {
+    width: 100%;
+  }
+  
+  .hide {
+    visibility: hidden;
+  }
+  </style>
+  
   <h1>La Jukebox du Twitch d'Eskimon</h1>
+
+  <label>Rechercher un son en particulier : </label>
+  <input name="search"></input>
 
   <table>
     <tr>
@@ -19,11 +32,11 @@
   </table>
 
   <script>
-  window.onload = function () {
   let table = document.querySelector('table')
 
   for (track of tracks) {
     let tr = document.createElement('tr')
+    track.node = tr
 
     let td = document.createElement('td')
     let name = document.createTextNode(track.command)
@@ -34,7 +47,7 @@
     let link = document.createElement('a')
     let href = 'javascript:navigator.clipboard.writeText("' + config.prefix + ' ' + track.command + '")'
     link.setAttribute('href', href)
-    let label = document.createTextNode('Copier dans le presse-papier')
+    let label = document.createTextNode('Copier')
     link.appendChild(label)
     td.appendChild(link)
     tr.appendChild(td)
@@ -44,14 +57,30 @@
     href = track.file
     link.setAttribute('href', href)
     link.setAttribute('target', '_blank')
-    label = document.createTextNode('Jouer le son')
+    label = document.createTextNode('Jouer')
     link.appendChild(label)
     td.appendChild(link)
     tr.appendChild(td)
 
     table.appendChild(tr)
   }
+  
+  function filter() {
+    let val = search.value.toLowerCase()
+    for (track of tracks) {
+      let name = track.command.toLowerCase()
+      if (name.includes(val)) {
+        track.node.classList.remove('hide')
+      } else {
+        track.node.classList.add('hide')
+      }
+    }
   }
+  
+  let search = document.querySelector('input[name=search]')
+  search.addEventListener('input', filter)
+  
+  filter()
   </script>
 </body>
 </html>
