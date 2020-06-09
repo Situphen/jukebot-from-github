@@ -1,136 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>My bot</title>
-    <script src="./config.js"></script>
-    <script src="./deps/tmi.min.js"></script>
-  </head>
-  <body>
-    <audio id="player" />
-  </body>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+
+  <title>La Jukebox du Twitch d'Eskimon</title>
+
+  <script src="./config.js"></script>
+</head>
+<body>
+  <h1>La Jukebox du Twitch d'Eskimon</h1>
+
+  <table>
+    <tr>
+      <th>Nom du son</th>
+      <th>Copier la commande</th>
+      <th>Jouer le son</th>
+    </tr>
+  </table>
+
   <script>
-    let cooldown = {
-      'chatters': {
-        // '<pseudo>': <date last command execution>
-      },
-      'tracks': {
-        // '<command>': <date last command execution>
-      },
-      'command': 0,
-    }
+  window.onload = function () {
+  let table = document.querySelector('table')
 
-    let isPlaying = false;
-    const player = document.getElementById('player');
-    player.addEventListener('ended', () => {
-      isPlaying = false;
-    });
+  for (track of tracks) {
+    let tr = document.createElement('tr')
 
-    const chat = new window.tmi.Client({
-      options: { debug: true },
-      connection: {
-        reconnect: true,
-        secure: true
-      },
-      // identity: {
-      //   username: 'bot-name',
-      //   password: 'oauth:my-bot-token'
-      // },
-      channels: [ config['channel'] ]
-    });
+    let td = document.createElement('td')
+    let name = document.createTextNode(track.command)
+    td.appendChild(name)
+    tr.appendChild(td)
+      
+    td = document.createElement('td')
+    let link = document.createElement('a')
+    let href = 'javascript:navigator.clipboard.writeText("' + config.prefix + ' ' + track.command + '")'
+    link.setAttribute('href', href)
+    let label = document.createTextNode('Copier dans le presse-papier')
+    link.appendChild(label)
+    td.appendChild(link)
+    tr.appendChild(td)
 
-    chat.connect();
+    td = document.createElement('td')
+    link = document.createElement('a')
+    href = track.file
+    link.setAttribute('href', href)
+    link.setAttribute('target', '_blank')
+    label = document.createTextNode('Jouer le son')
+    link.appendChild(label)
+    td.appendChild(link)
+    tr.appendChild(td)
 
-    chat.on('message', (channel, tags, message, self) => {
-      console.log(tags);
-      let data = message.split(' ');
-      let now = Date.now() / 1000.;
-
-      // First thing first, stop if requested
-      if((tags['mod'] === true) || (tags['username'] === config['channel'])) {
-        if (data[0] === '!stop') {
-          player.pause();
-          isPlaying = false;
-        }
-      }
-
-      // <prefix> <command>
-      if (data[0] !== config['prefix'])
-        // Fail-fast si le prefix est faux
-        return;
-
-      // Vérifie les droits des utilisateurs
-      if(config['rights']['user'] === false) {
-        if(tags['username'] === config['channel']) {
-          console.log(`${config['channel']} est le boss, lets go`);
-        }
-        else if((config['rights']['mods'] === true) && (tags['mod'] === true)) {
-          console.log(`${tags['username']} est un modo, lets go`);
-        }
-        else if((config['rights']['subs'] === true) &&
-          ('premium' in tags['badges'] || 'subscriber' in tags['badges'])) {
-          console.log(`${tags['username']} est un sub, lets go`);
-        }
-        else if((config['rights']['vips'] === true) && ('vip' in tags['badges'])) {
-          console.log(`${tags['username']} est un vip, lets go`);
-        } else {
-          return;
-        }
-      }
-
-      // Vérifie le cooldown du bot
-      if( cooldown['command'] > (now - config['cooldown']['command'])) {
-        console.error(`The use of the command is violating the ${config['cooldown']['command']}s cooldown`);
-        return;
-      }
-
-      // Vérifie qu'un fichier n'est pas déjà en lecture
-      if(isPlaying) {
-        console.error('Un morceau est déjà en lecture');
-        return;
-      }
-
-      let command = data[1];
-      // on parcours le tableau 'tracks'
-      for(let idx in tracks) {
-        // Si la command est trouvée
-        if(command === tracks[idx]['command']) {
-          console.log(`Lecture de ${tracks[idx]['file']} par ${tags['username']}`);
-
-          // Vérifions si l'utilisateur ne dépasse pas le cooldown
-          let user = tags['username'];
-          if (user in cooldown['chatters']) {
-            let ts = cooldown['chatters'][user];
-            if( ts > (now - config['cooldown']['user'])) {
-              console.error(`${user} is violating the ${config['cooldown']['user']}s cooldown`);
-              return;
-            }
-          }
-
-          // Vérifions si la track ne dépasse pas le cooldown
-          if (command in cooldown['tracks']) {
-            let ts = cooldown['tracks'][command];
-            if( ts > (now - config['cooldown']['track'])) {
-              console.error(`Track ${command} is violating the ${config['cooldown']['track']}s cooldown`);
-              return;
-            }
-          }
-
-          cooldown['chatters'][user] = now;  // Met à jour le ts du user
-          cooldown['tracks'][command] = now;
-          cooldown['command'] = now;
-
-          player.src = tracks[idx]['file'];
-          player.play()
-            .then(() => {
-              isPlaying = true;
-            })
-            .catch(() => {
-              isPlaying = false;
-            });
-        }
-      }
-    });
+    table.appendChild(tr)
+  }
+  }
   </script>
-
+</body>
 </html>
