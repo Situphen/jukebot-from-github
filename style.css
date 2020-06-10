@@ -136,17 +136,17 @@ h1 {
   border-style: double;
   border-width: 0 0 0 1.2em;
   top: -2px;
-  left: -2px;
+  left: -1px;
 }
 
 .play-button:hover {
   border-color: transparent transparent transparent #1f8e4e;
 }
 
-table {
-  table-layout: fixed;
-  word-wrap: break-word;
-  width: 100%;
+.no-results {
+  margin: 4rem 1.5rem;
+  font-size: 1.4rem;
+  text-align: center;
 }
 
 .hide {
