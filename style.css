@@ -116,13 +116,16 @@ h1 {
 
 .play-button {
   position: relative;
+  left: 0;
+
   box-sizing: border-box;
-  height: 1.4em;
+  height: 1.4rem;
+  font-size: .9rem;
 
   border-color: transparent transparent transparent #2dcb70;
   background: transparent;
 
-  transition: 100ms all ease;
+  transition: 200ms all linear;
 
   will-change: border-width;
   cursor: pointer;
@@ -133,10 +136,10 @@ h1 {
 }
 
 .play-button.is-playing {
+  left: -1px;
   border-style: double;
   border-width: 0 0 0 1.2em;
-  top: -2px;
-  left: -1px;
+  height: 1.5rem;
 }
 
 .play-button:hover {
