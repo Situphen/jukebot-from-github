@@ -5,84 +5,152 @@
 
   <title>La Jukebox du Twitch d'Eskimon</title>
 
+  <link rel="stylesheet" href="style.css" />
+
   <script src="./config.js"></script>
 </head>
 <body>
-  <style>
-  table {
-    table-layout: fixed;
-    word-wrap: break-word;
-    width: 100%;
-  }
-  
-  .hide {
-    display: none;
-  }
-  </style>
-  
-  <h1>La Jukebox du Twitch d'Eskimon</h1>
+  <div class="container">
+    <h1>La Jukebox du Twitch d'Eskimon</h1>
 
-  <label>Rechercher un son en particulier : </label>
-  <input name="search"></input>
-
-  <table>
-    <tr>
-      <th style="width: 70%;">Nom du son</th>
-      <th style="width: 15%;">Copier la commande</th>
-      <th style="width: 15%;">Jouer le son</th>
-    </tr>
-  </table>
+    <section class="tracks-list">
+      <header>
+        <h2>Liste des pistes disponibles</h2>
+        <label class="fitler-form">
+          <span class="sr-only">Rechercher un son en particulier</span>
+          <input type="search" name="search" placeholder="Rechercher un son…" />
+        </label>
+      </header>
+      <div class="tracks"></div>
+    </section>
+  </div>
 
   <script>
-  let table = document.querySelector('table')
+    let tracks_container = document.querySelector('section.tracks-list .tracks')
+    let audio_container = tracks_container.parentElement
 
-  for (track of tracks) {
-    let tr = document.createElement('tr')
-    track.node = tr
+    let audio_element = null
+    let playing_track = null
 
-    let td = document.createElement('td')
-    let name = document.createTextNode(track.command)
-    td.appendChild(name)
-    tr.appendChild(td)
-      
-    td = document.createElement('td')
-    let link = document.createElement('a')
-    let href = 'javascript:navigator.clipboard.writeText("' + config.prefix + ' ' + track.command + '")'
-    link.setAttribute('href', href)
-    let label = document.createTextNode('Copier')
-    link.appendChild(label)
-    td.appendChild(link)
-    tr.appendChild(td)
+    function normalize(str) {
+      return str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[-_]/g, ' ').toLowerCase()
+    }
 
-    td = document.createElement('td')
-    link = document.createElement('a')
-    href = track.file
-    link.setAttribute('href', href)
-    link.setAttribute('target', '_blank')
-    label = document.createTextNode('Jouer')
-    link.appendChild(label)
-    td.appendChild(link)
-    tr.appendChild(td)
+    function play(track) {
+      if (playing_track) {
+        let stop_current = playing_track === track
+        stop(playing_track)
+        if (stop_current) return
+      }
 
-    table.appendChild(tr)
-  }
-  
-  function filter() {
-    let val = search.value.toLowerCase()
-    for (track of tracks) {
-      let name = track.command.toLowerCase()
-      if (name.includes(val)) {
-        track.node.classList.remove('hide')
-      } else {
-        track.node.classList.add('hide')
+      playing_track = track
+
+      let button = playing_track.node.querySelector('button.play-button')
+      button.classList.add('is-playing')
+      button.blur()
+
+      audio_element = document.createElement('audio')
+
+      audio_element.controls = false
+      audio_element.src = track.file
+
+      audio_element.load()
+
+      audio_element.addEventListener("canplay", event => {
+        audio_element.play();
+      });
+
+      audio_element.addEventListener("ended", event => {
+        stop(track)
+      });
+    }
+
+    // Returns true if the stopped track was playing.
+    function stop(track) {
+      let button = track.node.querySelector('button.play-button')
+      if (button) button.classList.remove('is-playing')
+
+      if (playing_track === track) {
+        audio_element.pause()
+        audio_element.remove()
+        playing_track = null
       }
     }
-  }
-  
-  let search = document.querySelector('input[name=search]')
-  search.addEventListener('input', filter)
-  
-  filter()
+
+    for (track of tracks) {
+      let curr_track = track;
+
+      let track_article = document.createElement('article')
+      track_article.classList.add('track')
+
+      track.node = track_article
+      track.command_normalized = normalize(track.command)
+
+      // Play button
+
+      let play_container = document.createElement('div')
+      play_container.classList.add('play')
+
+      let play_button = document.createElement('button')
+      play_button.classList.add('play-button')
+      play_button.setAttribute('title', 'Écouter cette piste')
+      play_button.addEventListener('click', () => play(curr_track))
+
+      let play_button_text = document.createElement('span')
+      play_button_text.classList.add('sr-only')
+      play_button_text.innerText = 'Écouter cette piste'
+
+      play_button.appendChild(play_button_text)
+      play_container.appendChild(play_button)
+      track_article.appendChild(play_container)
+
+      // Track name
+
+      // We add break word marks after underscores so the track name
+      // breaks nicely.
+      let track_name_html = track.command.replace(/_/g, '_<wbr/>')
+
+      let track_name_paragraph = document.createElement('p')
+      track_name_paragraph.innerHTML = track_name_html
+      //let track_name = document.createTextNode(track.command)
+      let track_copy = document.createElement('span')
+
+      track_copy.classList.add('copy')
+      track_copy.innerText = '(cliquer pour copier)'
+
+      let command = config.prefix + ' ' + track.command;
+
+      track_name_paragraph.addEventListener('click', () => {
+        navigator.clipboard.writeText(command)
+        track_copy.innerText = '(copié !)'
+        setTimeout(() => track_copy.innerText = '(cliquer pour copier)', 2000)
+      })
+
+      //track_name_paragraph.appendChild(track_name)
+      track_name_paragraph.appendChild(track_copy)
+      track_article.appendChild(track_name_paragraph)
+
+      tracks_container.appendChild(track_article)
+    }
+
+    function filter() {
+      let val = normalize(search.value)
+      for (track of tracks) {
+        if (track.command_normalized.includes(val)) {
+          track.node.classList.remove('hide')
+        } else {
+          track.node.classList.add('hide')
+        }
+      }
+    }
+
+    let search = document.querySelector('input[name=search]')
+    search.addEventListener('input', filter)
+
+    filter()
   </script>
 </body>
 </html>

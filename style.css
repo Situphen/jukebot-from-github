@@ -1,0 +1,152 @@
+body {
+  font-family: 'Fira Sans', sans-serif;
+  font-weight: 200;
+}
+
+.container {
+  flex-grow: 1;
+  margin: 0 auto;
+  position: relative;
+  width: auto;
+}
+
+@media screen and (min-width: 1408px) {
+  .container {
+    max-width: 1344px;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap; /* added line */
+  border: 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+.tracks-list {
+  border: solid 1px #ddd;
+  border-radius: 4px;
+}
+
+.tracks-list header {
+  display: flex;
+  align-items: center;
+  margin: 0 0 .4rem 0;
+  padding: 0;
+  border-bottom: solid 1px #eee;
+}
+
+.tracks-list header h2 {
+  flex: 2;
+  font-weight: normal;
+  margin: 0;
+  padding: .6rem 1rem;
+}
+
+.tracks-list header label {
+  flex: 1;
+  margin: 0;
+
+  width: 100%;
+  height: 3.4rem;
+}
+
+.tracks-list header label input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-left: 1px solid #eee;
+  border-radius: 0;
+  padding: 0 0 0 1rem;
+}
+
+.tracks-list .tracks {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tracks-list .tracks .track {
+  display: flex;
+  align-items: center;
+
+  margin: .6rem 1rem;
+
+  width: calc(48% - 2rem);
+  height: 2.4rem;
+}
+
+.tracks-list .tracks .track.hide {
+  display: none;
+}
+
+.tracks-list .tracks .track p {
+  width: 100%;
+  font-weight: 1.1rem;
+  color: #202020;
+  cursor: pointer;
+}
+
+.tracks-list .tracks .track p:hover {
+  color: #000;
+  font-weight: normal;
+}
+
+.tracks-list .tracks .track p span.copy {
+  display: none;
+  padding-left: .4em;
+  vertical-align: middle;
+  font-size: .8em;
+}
+
+.tracks-list .tracks .track p:hover span.copy {
+  display: inline-block;
+  font-weight: 200;
+}
+
+.play-button {
+  position: relative;
+  box-sizing: border-box;
+  height: 1.4em;
+
+  border-color: transparent transparent transparent #2dcb70;
+  background: transparent;
+
+  transition: 100ms all ease;
+
+  will-change: border-width;
+  cursor: pointer;
+
+  /* for play state */
+  border-style: solid;
+  border-width: 1em 0 1em 1.2em;
+}
+
+.play-button.is-playing {
+  border-style: double;
+  border-width: 0 0 0 1.2em;
+  top: -2px;
+  left: -2px;
+}
+
+.play-button:hover {
+  border-color: transparent transparent transparent #1f8e4e;
+}
+
+table {
+  table-layout: fixed;
+  word-wrap: break-word;
+  width: 100%;
+}
+
+.hide {
+  display: none;
+}
