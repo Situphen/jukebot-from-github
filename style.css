@@ -155,3 +155,36 @@ h1 {
 .hide {
   display: none;
 }
+
+@media screen and (max-width: 768px) {
+  .is-desktop-only {
+    display: none;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .tracks-list header h2 {
+    flex: 1;
+    font-size: 1.4rem;
+  }
+
+  .tracks-list header label {
+    flex: 3;
+  }
+
+  .tracks-list header label input {
+    font-size: 1rem;
+  }
+
+  .tracks-list .tracks .track {
+    width: 100%;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .is-mobile-only {
+    display: none;
+  }
+}
