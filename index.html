@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <title>La Jukebox du Twitch d'Eskimon</title>
 
@@ -15,7 +16,10 @@
 
     <section class="tracks-list">
       <header>
-        <h2>Liste des pistes disponibles</h2>
+        <h2>
+          <span class="is-desktop-only">Liste des pistes disponibles</span>
+          <span class="is-mobile-only">Pistes</span>
+        </h2>
         <label class="fitler-form">
           <span class="sr-only">Rechercher un son en particulier</span>
           <input type="search" name="search" placeholder="Rechercher un son…" />
