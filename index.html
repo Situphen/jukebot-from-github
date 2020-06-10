@@ -22,6 +22,9 @@
         </label>
       </header>
       <div class="tracks"></div>
+      <div class="no-results hide">
+        <p>Aucune piste ne correspond, malheureusement :'(</p>
+      </div>
     </section>
   </div>
 
@@ -136,18 +139,24 @@
       tracks_container.appendChild(track_article)
     }
 
+    let search = document.querySelector('input[name=search]')
+    let no_results = document.querySelector('.no-results')
+
     function filter() {
       let val = normalize(search.value)
+      let has_results = false
       for (track of tracks) {
         if (track.command_normalized.includes(val)) {
           track.node.classList.remove('hide')
+          has_results = true
         } else {
           track.node.classList.add('hide')
         }
       }
+
+      no_results.classList.toggle('hide', has_results)
     }
 
-    let search = document.querySelector('input[name=search]')
     search.addEventListener('input', filter)
 
     filter()
